@@ -1,0 +1,14 @@
+---
+description: Drizzle ORM and SQLite usage (expo-sqlite)
+globs: **/db/**/*,**/*schema*,**/drizzle*
+alwaysApply: false
+---
+
+# Drizzle + SQLite (Expo)
+
+- **Driver:** Use expo-sqlite for the SQLite connection. Configure Drizzle’s SQLite adapter to use the expo-sqlite connection (or wrapper) so all queries run on the local DB file.
+- **Schema:** Define tables with `sqliteTable()`. Use `integer()`/`text()`/`real()` as appropriate. For timestamps use `integer('created_at', { mode: 'timestamp' })` or text ISO strings consistently. Use `references()` for foreign keys (e.g. salesEntries → products, salesPeriods).
+- **Soft deletes:** Products use `deletedAt` (nullable timestamp/integer). Default queries for “active” products use `isNull(products.deletedAt)`. Do not hard-delete products that are referenced by salesEntries.
+- **Queries:** Prefer Drizzle query builder (select, insert, update, delete) over raw SQL. Use `eq`, `and`, `gte`, `lte`, `isNull`, `sql` for conditions. For reports, join salesEntries with products and salesPeriods; filter by date range on salesPeriods.
+- **Transactions:** Use Drizzle transactions for multi-step writes (e.g. create period + insert multiple salesEntries). Avoid leaving the DB in a half-updated state.
+- **Types:** Export inferred types from schema (e.g. `typeof products.$inferSelect`) for use in app code. Do not duplicate entity shapes in separate TypeScript interfaces when the schema is the source of truth.

@@ -1,0 +1,12 @@
+---
+description: Project stack and constraints (Expo, gluestack, forms, DB)
+alwaysApply: true
+---
+
+# Spaza Accounting – Project Stack
+
+- **Expo only.** No eject to bare React Native. Use Expo APIs and compatible libraries only.
+- **UI:** Gluestack UI (`@gluestack-ui/themed`). Wrap app with `GluestackUIProvider`; use Gluestack components (Box, Text, Button, Input, etc.) for all UI. Do not use raw React Native components for layout/forms when a Gluestack equivalent exists.
+- **Forms:** React Hook Form for form state; Zod for validation. Use `@hookform/resolvers/zod` to wire Zod schemas to RHF. One Zod schema per form; co-locate or import in the same file as the form component.
+- **Data:** SQLite via expo-sqlite; Drizzle ORM for schema and queries. Offline-only; no cloud sync. Run Drizzle migrations on app startup.
+- **Reference:** PRD.md for features and data model; todo.md for task breakdown.

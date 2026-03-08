@@ -1,0 +1,24 @@
+---
+description: Gluestack UI and React Hook Form + Zod patterns
+globs: **/*.tsx,**/*.jsx
+alwaysApply: false
+---
+
+# UI & Forms
+
+## Gluestack
+- Import from `@gluestack-ui/themed` (e.g. Box, Text, Button, Input, FormControl, Select).
+- Use Gluestack layout (Box, VStack, HStack) and form components instead of raw View/TextInput where possible.
+- Keep theme/config usage consistent with project (e.g. `@gluestack-ui/config` if installed).
+
+## React Hook Form + Zod
+- Use `useForm` from `react-hook-form` with `resolver: zodResolver(schema)`.
+- Define a Zod schema (e.g. `productSchema`) with `.shape()` for fields; use for both validation and TypeScript types via `z.infer<typeof productSchema>`.
+- Register inputs with `controller` or `register`; display errors with `formState.errors` and Gluestack FormControl error message.
+- For numeric fields (e.g. price, quantity), use `z.coerce.number().min(0)` or similar so strings are coerced and validated.
+
+```ts
+// Example: schema + resolver
+const schema = z.object({ name: z.string().min(1), sellPrice: z.coerce.number().min(0), costPrice: z.coerce.number().min(0) });
+useForm({ resolver: zodResolver(schema), defaultValues: { ... } });
+```

@@ -1,0 +1,14 @@
+---
+description: General conventions and practices for the accounting app
+alwaysApply: true
+---
+
+# Conventions
+
+- **Offline-first:** No network calls for core flows. All data from local SQLite. Do not add fetch/API calls for product or sales data.
+- **Errors:** Surface DB and validation errors to the user in UI (e.g. toast or inline message). Log errors for debugging. Do not swallow errors silently.
+- **Loading:** Show loading state (e.g. spinner or skeleton) when reading from DB or running migrations. Block or guard main UI until migrations complete.
+- **Lists:** Products list shows active only by default; optional “Show deleted” for audit. Sales entry form only offers active products.
+- **Numbers:** Store and display money/quantities consistently (e.g. two decimal places for currency). Use numbers in schema (real/integer) and Zod coercion for inputs.
+- **Files:** Prefer feature-oriented structure (e.g. screens/products/, db/, hooks/). Keep schema and migrations under a dedicated db or similar folder.
+- **Todo:** Whenever a task or subtask is completed, mark it complete in **todo.md** by changing `- [ ]` to `- [x]` for that item.

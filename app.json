@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "Spaza Accounting",
+    "slug": "accounting",
+    "version": "1.0.0",
+    "plugins": [
+      "expo-sqlite"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "isTabletOnly": false
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "userInterfaceStyle": "light",
+    "orientation": "default"
+  }
+}

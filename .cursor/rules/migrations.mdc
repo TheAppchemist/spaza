@@ -1,0 +1,14 @@
+---
+description: Rules for Drizzle migrations and schema changes
+globs: **/migrations/**/*,**/drizzle.config.*,**/schema*
+alwaysApply: false
+---
+
+# Migrations (Drizzle)
+
+- **Single source of truth:** Schema is defined in code (Drizzle schema files). Migrations are generated from schema, not written by hand (except rare fixes).
+- **Generate, don’t edit:** After changing schema, run `drizzle-kit generate` (or project script). Do not manually write new migration SQL unless fixing a generated migration.
+- **Naming:** Use the default migration naming (timestamp or sequential). Keep one logical change per migration (e.g. one table or one set of columns).
+- **Safety:** Prefer additive changes: add column, add table, add index. Avoid dropping columns/tables in the same migration as renames; do renames in one migration and drops in a later one if needed. Document any destructive step.
+- **Run on startup:** App must run pending migrations on launch (e.g. via Drizzle’s migrate API or a small runner that executes migration SQL). Handle failures (log, optional user message); do not ignore.
+- **Version control:** Commit both schema changes and generated migration files. Do not commit `*.db` or other local DB files.

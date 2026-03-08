@@ -1,16 +1,18 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, protocol, net } = require("electron");
 const path = require("path");
 const fs = require("fs").promises;
+const { pathToFileURL } = require("url");
 
 const isDev = process.env.NODE_ENV !== "production" && !app.isPackaged;
 const WEB_URL = "http://localhost:8081";
-// In production: dist is unpacked to app.asar.unpacked/dist (so Windows can load it)
-function getDistPath() {
-  if (!app.isPackaged) return path.join(__dirname, "..", "dist", "index.html");
+const APP_PROTOCOL = "app";
+
+function getDistDir() {
+  if (!app.isPackaged) return path.join(__dirname, "..", "dist");
   const appPath = app.getAppPath();
-  const unpacked = path.join(path.dirname(appPath), "app.asar.unpacked", "dist", "index.html");
-  return unpacked;
+  return path.join(path.dirname(appPath), "app.asar.unpacked", "dist");
 }
+
 const PRELOAD_PATH = path.join(__dirname, "preload.js");
 
 const DB_FILENAME = "accounting.db";
@@ -55,14 +57,31 @@ function createWindow() {
     win.loadURL(WEB_URL);
     win.webContents.openDevTools();
   } else {
-    const distPath = getDistPath();
-    win.loadFile(distPath);
+    // Load via custom protocol so absolute paths (/_expo/...) resolve to dist/
+    win.loadURL(`${APP_PROTOCOL}://localhost/index.html`);
   }
 
   win.on("closed", () => app.quit());
 }
 
-app.whenReady().then(createWindow);
+// Custom protocol: app:// serves files from dist (fixes ERR_FILE_NOT_FOUND and dynamic chunk loading)
+protocol.registerSchemesAsPrivileged([
+  { scheme: APP_PROTOCOL, privileges: { standard: true, secure: true, supportFetchAPI: true } },
+]);
+
+app.whenReady().then(() => {
+  const distDir = getDistDir();
+  protocol.handle(APP_PROTOCOL, (request) => {
+    const u = new URL(request.url);
+    let p = decodeURIComponent(u.pathname || "/");
+    if (p.startsWith("/")) p = p.slice(1);
+    if (!p || p === "/") p = "index.html";
+    const filePath = path.join(distDir, p);
+    const fileUrl = pathToFileURL(filePath).href;
+    return net.fetch(fileUrl);
+  });
+  createWindow();
+});
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();

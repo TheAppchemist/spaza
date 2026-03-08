@@ -13,8 +13,8 @@
     "db:migrate": "drizzle-kit migrate",
     "electron": "electron electron/main.js",
     "electron:dev": "concurrently \"expo start --web\" \"wait-on http://localhost:8081 && electron electron/main.js\"",
-    "electron:build": "expo export -p web && electron-builder --dir",
-    "electron:build:win": "expo export -p web && electron-builder --win --x64"
+    "electron:build": "expo export -p web && node scripts/fix-dist-for-electron.js && electron-builder --dir",
+    "electron:build:win": "expo export -p web && node scripts/fix-dist-for-electron.js && electron-builder --win --x64"
   },
   "build": {
     "appId": "com.spaza.accounting",

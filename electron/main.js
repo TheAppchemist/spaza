@@ -1,14 +1,16 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const fs = require("fs").promises;
-const { pathToFileURL } = require("url");
 
 const isDev = process.env.NODE_ENV !== "production" && !app.isPackaged;
 const WEB_URL = "http://localhost:8081";
-// In production (packaged), use app root so path works on Windows; in dev use __dirname
-const DIST_PATH = app.isPackaged
-  ? path.join(app.getAppPath(), "dist", "index.html")
-  : path.join(__dirname, "../dist/index.html");
+// In production: dist is unpacked to app.asar.unpacked/dist (so Windows can load it)
+function getDistPath() {
+  if (!app.isPackaged) return path.join(__dirname, "..", "dist", "index.html");
+  const appPath = app.getAppPath();
+  const unpacked = path.join(path.dirname(appPath), "app.asar.unpacked", "dist", "index.html");
+  return unpacked;
+}
 const PRELOAD_PATH = path.join(__dirname, "preload.js");
 
 const DB_FILENAME = "accounting.db";
@@ -53,8 +55,8 @@ function createWindow() {
     win.loadURL(WEB_URL);
     win.webContents.openDevTools();
   } else {
-    // loadURL with file: protocol is more reliable on Windows when loading from asar
-    win.loadURL(pathToFileURL(DIST_PATH).href);
+    const distPath = getDistPath();
+    win.loadFile(distPath);
   }
 
   win.on("closed", () => app.quit());

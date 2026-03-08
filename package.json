@@ -22,6 +22,7 @@
     "extraMetadata": { "main": "electron/main.js" },
     "directories": { "output": "release" },
     "files": ["dist/**", "electron/**"],
+    "asarUnpack": ["dist/**"],
     "win": {
       "target": ["nsis", "portable"]
     },
